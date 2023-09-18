@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import type { ComponentMap } from './types/login-type'
 
 import PhoneCodeForm from './components/PhoneCodeForm.vue'
 import AccountForm from './components/AccountForm.vue'
@@ -9,7 +10,7 @@ const bgColor = 'linear-gradient(0deg, #2196f3, #00bcd4, #00bcd4, #03a9f4)'
 const loginPanelWidth = '800px'
 const loginPanelHeight = '400px'
 
-const tabList = ref([
+const tabList = ref<ComponentMap[]>([
   { name: '免密登录', componentName: PhoneCodeForm },
   { name: '账号登录', componentName: AccountForm },
   { name: '扫码登录', componentName: QcodeForm }
