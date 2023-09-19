@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
 import type { LoginFormType } from '../types/login-type'
 import { phoneCodeFormRules } from '../rules'
-import utils from '@/utils/utils'
 
 const formSize = ref('default')
 const ruleFormRef = ref<FormInstance>()
@@ -13,6 +12,10 @@ const loginForm = reactive<LoginFormType>({
   imgcode: '',
   saveUserName: false
 })
+
+import { useGetPhoneCode, useHandleSaveUser } from '../composable'
+const { disabled, getSmsCode, smsCodeBtnText } = useGetPhoneCode(loginForm)
+const { saveLocalUser, getLocalUser } = useHandleSaveUser(loginForm)
 
 // 图片验证码
 const imgCodeSrc = ref(new URL('../../../assets/code.png', import.meta.url).href)
@@ -27,18 +30,17 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     if (valid) {
       // 1. 点击登录按钮,判断是否保存用户名,如果保存用户名,则将用户名和保存的状态存储到本地
       console.log(loginForm.saveUserName)
-      if (loginForm.saveUserName) {
-        // 1. 将用户名存储到本地
-        utils.saveData('username', loginForm.username)
-        // 2. 将保存的状态存储到本地
-        utils.saveData('saveUserName', JSON.stringify(loginForm.saveUserName))
-      }
+      saveLocalUser()
       console.log('submit!')
     } else {
       console.log('error submit!', fields)
     }
   })
 }
+
+onMounted(() => {
+  getLocalUser()
+})
 </script>
 
 <template>
@@ -71,7 +73,9 @@ const submitForm = async (formEl: FormInstance | undefined) => {
             />
           </div>
           <div class="code-btn">
-            <el-button type="primary" size="large">获取验证码</el-button>
+            <el-button :disabled="disabled" type="primary" size="large" @click="getSmsCode">{{
+              smsCodeBtnText
+            }}</el-button>
           </div>
         </div>
       </el-form-item>
@@ -112,6 +116,10 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     :deep(.el-button),
     :deep(img) {
       width: 100px;
+    }
+
+    &:deep(.el-button) {
+      font-size: 12px;
     }
 
     img {
