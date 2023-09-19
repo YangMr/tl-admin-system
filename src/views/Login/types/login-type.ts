@@ -5,10 +5,18 @@ export type ComponentMap = {
   componentName: DefineComponent<{}, {}, any>
 }
 
-// 定义登录表单的数据类型
-export interface LoginFormType {
-  username: string
+// 定义手机验证码登录的表单数据类型
+export type PhoneCodeFormType = {
+  phone: string
   smscode: string
   imgcode: string
-  saveUserName: boolean
+  savePhone?: boolean
+}
+
+// 定义账号密码登录的表单数据类型
+export type AccountFormType = Pick<PhoneCodeFormType, 'imgcode'> & {
+  password: string
+  username: string
+  saveUserName?: boolean
+  saveUserPass?: boolean
 }

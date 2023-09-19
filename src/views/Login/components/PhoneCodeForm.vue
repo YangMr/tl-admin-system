@@ -1,27 +1,23 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
-import type { LoginFormType } from '../types/login-type'
+import type { PhoneCodeFormType } from '../types/login-type'
 import { phoneCodeFormRules } from '../rules'
 
 const formSize = ref('default')
 const ruleFormRef = ref<FormInstance>()
-const loginForm = reactive<LoginFormType>({
-  username: '',
+const loginForm = reactive<PhoneCodeFormType>({
+  phone: '',
   smscode: '',
   imgcode: '',
-  saveUserName: false
+  savePhone: false
 })
 
-import { useGetPhoneCode, useHandleSaveUser } from '../composable'
+import { useGetPhoneCode, useHandleSaveUser } from '../composable/phone-code'
+import { useGetImgCode } from '../composable'
 const { disabled, getSmsCode, smsCodeBtnText } = useGetPhoneCode(loginForm)
 const { saveLocalUser, getLocalUser } = useHandleSaveUser(loginForm)
-
-// 图片验证码
-const imgCodeSrc = ref(new URL('../../../assets/code.png', import.meta.url).href)
-
-// 点击切换图片验证码
-const getImgCode = () => {}
+const { imgCodeSrc, getImgCode } = useGetImgCode()
 
 // 提交表单方法
 const submitForm = async (formEl: FormInstance | undefined) => {
@@ -29,7 +25,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       // 1. 点击登录按钮,判断是否保存用户名,如果保存用户名,则将用户名和保存的状态存储到本地
-      console.log(loginForm.saveUserName)
+
       saveLocalUser()
       console.log('submit!')
     } else {
@@ -58,8 +54,8 @@ onMounted(() => {
         <el-input
           size="large"
           prefix-icon="UserFilled"
-          v-model="loginForm.username"
-          placeholder="请输入用户名"
+          v-model="loginForm.phone"
+          placeholder="请输入手机号"
         />
       </el-form-item>
       <el-form-item prop="smscode">
@@ -95,7 +91,7 @@ onMounted(() => {
         </div>
       </el-form-item>
       <el-form-item>
-        <el-checkbox v-model="loginForm.saveUserName">记住用户名</el-checkbox>
+        <el-checkbox v-model="loginForm.savePhone">记住用户名</el-checkbox>
       </el-form-item>
       <el-form-item>
         <el-button class="login-btn" round type="danger" @click="submitForm(ruleFormRef)">

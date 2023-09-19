@@ -1,27 +1,23 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
-import type { LoginFormType } from '../types/login-type'
-import { phoneCodeFormRules } from '../rules'
+import type { AccountFormType } from '../types/login-type'
+import { accountFormRules } from '../rules'
 
 const formSize = ref('default')
 const ruleFormRef = ref<FormInstance>()
-const loginForm = reactive<LoginFormType>({
+const accountForm = reactive<AccountFormType>({
   username: '',
-  smscode: '',
+  password: '',
   imgcode: '',
-  saveUserName: false
+  saveUserName: false,
+  saveUserPass: false
 })
 
-import { useGetPhoneCode, useHandleSaveUser } from '../composable'
-const { disabled, getSmsCode, smsCodeBtnText } = useGetPhoneCode(loginForm)
-const { saveLocalUser, getLocalUser } = useHandleSaveUser(loginForm)
-
-// 图片验证码
-const imgCodeSrc = ref(new URL('../../../assets/code.png', import.meta.url).href)
-
-// 点击切换图片验证码
-const getImgCode = () => {}
+import { useGetImgCode } from '../composable'
+const { imgCodeSrc, getImgCode } = useGetImgCode()
+import { useHandleSaveUserOrPass } from '../composable/account'
+const { useSaveLocalUserOrPass, useGetLocalUserOrPass } = useHandleSaveUserOrPass()
 
 // 提交表单方法
 const submitForm = async (formEl: FormInstance | undefined) => {
@@ -29,8 +25,8 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   await formEl.validate((valid, fields) => {
     if (valid) {
       // 1. 点击登录按钮,判断是否保存用户名,如果保存用户名,则将用户名和保存的状态存储到本地
-      console.log(loginForm.saveUserName)
-      saveLocalUser()
+      useSaveLocalUserOrPass()
+      // saveLocalUser()
       console.log('submit!')
     } else {
       console.log('error submit!', fields)
@@ -39,7 +35,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
 }
 
 onMounted(() => {
-  getLocalUser()
+  useGetLocalUserOrPass()
 })
 </script>
 
@@ -47,8 +43,8 @@ onMounted(() => {
   <div class="account-page">
     <el-form
       ref="ruleFormRef"
-      :model="loginForm"
-      :rules="phoneCodeFormRules"
+      :model="accountForm"
+      :rules="accountFormRules"
       label-width="0"
       class="demo-ruleForm"
       :size="formSize"
@@ -58,21 +54,18 @@ onMounted(() => {
         <el-input
           size="large"
           prefix-icon="UserFilled"
-          v-model="loginForm.username"
+          v-model="accountForm.username"
           placeholder="请输入用户名"
         />
       </el-form-item>
-      <el-form-item prop="smscode">
-        <div class="flex login-line">
-          <div class="flex-item">
-            <el-input
-              size="large"
-              prefix-icon="Picture"
-              v-model="loginForm.smscode"
-              placeholder="请输入短信验证码"
-            />
-          </div>
-        </div>
+      <el-form-item prop="username">
+        <el-input
+          size="large"
+          prefix-icon="UserFilled"
+          type="password"
+          v-model="accountForm.password"
+          placeholder="请输入密码"
+        />
       </el-form-item>
       <el-form-item prop="imgcode">
         <div class="flex login-line">
@@ -80,7 +73,7 @@ onMounted(() => {
             <el-input
               size="large"
               prefix-icon="PictureRounded"
-              v-model="loginForm.imgcode"
+              v-model="accountForm.imgcode"
               placeholder="请输入图片验证码"
             />
           </div>
@@ -90,9 +83,15 @@ onMounted(() => {
         </div>
       </el-form-item>
       <el-form-item>
-        <el-checkbox v-model="loginForm.saveUserName">记住用户名</el-checkbox>
-        <el-checkbox v-model="loginForm.saveUserName">记住密码</el-checkbox>
-        <roouter-link>忘记密码?</roouter-link>
+        <div class="flex-item">
+          <el-checkbox v-model="accountForm.saveUserName">记住用户名</el-checkbox>
+        </div>
+        <div class="flex-item">
+          <el-checkbox v-model="accountForm.saveUserPass">记住密码</el-checkbox>
+        </div>
+        <div class="flex-item">
+          <router-link to="/ResetPwd">忘记密码?</router-link>
+        </div>
       </el-form-item>
       <el-form-item>
         <el-button class="login-btn" round type="danger" @click="submitForm(ruleFormRef)">
