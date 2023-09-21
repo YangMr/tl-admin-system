@@ -2,6 +2,7 @@
 import type { DATA } from '@/types/request'
 import axios from 'axios'
 import type { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
+import utils from '@/utils/utils'
 
 // 创建axios实例对象
 const api = axios.create({
@@ -36,9 +37,24 @@ api.interceptors.request.use(
 // 响应拦截器
 api.interceptors.response.use(
   (response: AxiosResponse) => {
-    return response.data
+    if (response.status === 200) {
+      const data = response.data
+      // 全局异常处理
+      if (data.code !== 888) {
+        return utils.showError(data.message || '发生错误')
+      }
+      return data
+    }
+
+    if (response.status === 401) {
+      // TODO token过期处理
+      return
+    }
+
+    utils.showError('请求失败')
   },
   (error) => {
+    utils.showError(error.response.statusText || '请求失败')
     return Promise.reject(error)
   }
 )

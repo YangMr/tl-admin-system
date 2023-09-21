@@ -43,23 +43,29 @@ const submitForm = async (formEl: FormInstance | undefined) => {
 
     // 1. 点击登录按钮,判断是否保存用户名,如果保存用户名,则将用户名和保存的状态存储到本地
     useSaveLocalUserOrPass()
+    // 开启loading
+    utils.openLoading()
 
     // 2. 调用登录接口
-    const res = await accountLogin({
-      username: accountForm.username,
-      password: accountForm.password,
-      imgcode: accountForm.imgcode
-    })
+    try {
+      const res = await accountLogin({
+        username: accountForm.username,
+        password: accountForm.password,
+        imgcode: accountForm.imgcode
+      })
 
-    if (res.code === 888) {
-      // 存储到pinia
-      store.setToken(res.token!)
-      store.setUser(res.data!)
+      if (res.code === 888) {
+        // 存储到pinia
+        store.setToken(res.token!)
+        store.setUser(res.data!)
 
-      // 跳转到主页
-      router.push('/')
-    } else {
-      console.log(res.message)
+        // 跳转到主页
+        router.push('/')
+      }
+      console.log('4')
+    } finally {
+      // 关闭loading
+      utils.closeLoading()
     }
   })
 }
