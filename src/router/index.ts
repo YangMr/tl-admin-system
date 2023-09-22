@@ -22,7 +22,15 @@ const router = createRouter({
     {
       path: '/home',
       name: 'home',
-      component: () => import('@/layout/index.vue')
+      component: () => import('@/layout/index.vue'),
+      redirect: '/home/index',
+      children: [
+        {
+          path: '/home/index',
+          name: 'index',
+          component: () => import('@/views/Dashbord/index.vue')
+        }
+      ]
     }
   ]
 })

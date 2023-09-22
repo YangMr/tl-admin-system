@@ -20,7 +20,6 @@ const asideWidth = computed(() => {
         <ComHeader />
       </el-header>
       <el-main>
-        123
         <router-view></router-view>
       </el-main>
     </el-container>
@@ -32,7 +31,7 @@ const asideWidth = computed(() => {
   height: 100%;
 
   .el-aside {
-    background: green;
+    background: var(--junjun-topbar-bg);
     transition: width 0.4s linear;
   }
 
