@@ -3,13 +3,21 @@ import MenuItem from './MenuItem.vue'
 import { ref } from 'vue'
 import { useMenuStore } from '@/stores/menu'
 import { computed } from 'vue'
+import { getMenuData } from '@/api/user'
+import type { MenuResponseType } from '@/types/menu'
 const store = useMenuStore()
 
 const isCollapse = computed(() => {
   return store.getMenuStatus()
 })
 
-const menuData = ref([])
+const menuData = ref<MenuResponseType[]>([])
+
+const getMenuList = async () => {
+  const menuRes = await getMenuData()
+  menuData.value = menuRes.data!
+}
+getMenuList()
 </script>
 
 <template>

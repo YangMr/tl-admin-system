@@ -10,6 +10,9 @@ import { globalRegister } from './global'
 // 引入mockjs
 import './mock'
 
+// 引入权限文件
+import './permission'
+
 const app = createApp(App)
 
 app.use(router)

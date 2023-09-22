@@ -18,7 +18,7 @@ defineProps<{
       <MenuItem :menu="item.children" v-if="item.children && item.children.length > 0" />
     </el-sub-menu>
     <!-- 渲染的是没有子菜单的数据 -->
-    <el-menu-item v-else index="/home/index">
+    <el-menu-item v-else :index="item.path">
       <el-icon>
         <component :is="item.icon"></component>
       </el-icon>

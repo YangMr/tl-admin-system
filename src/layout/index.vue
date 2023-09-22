@@ -33,11 +33,13 @@ const asideWidth = computed(() => {
   .el-aside {
     background: var(--junjun-topbar-bg);
     transition: width 0.4s linear;
+    border-right: 1px solid grey;
   }
 
   .el-header {
     height: 60px;
     padding: 0 10px;
+    background: var(--junjun-topbar-bg);
   }
 
   .el-main {

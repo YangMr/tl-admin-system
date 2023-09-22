@@ -1,6 +1,8 @@
 import Mock from 'mockjs'
 const Random = Mock.Random
 
+import './menuData'
+
 // 导入数据
 import user from './userData'
 
