@@ -10,6 +10,7 @@ module.exports = {
     '@vue/eslint-config-prettier/skip-formatting'
   ],
   rules: {
+    'no-debugger': 'off',
     'prettier/prettier': [
       'warn',
       {

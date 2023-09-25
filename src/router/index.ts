@@ -30,7 +30,9 @@ const router = createRouter({
           name: 'index',
           component: () => import('@/views/Dashbord/index.vue'),
           meta: {
-            requireAuth: true
+            requireAuth: true,
+            title: '工作台',
+            icon: 'Monitor'
           }
         },
         {
@@ -38,7 +40,9 @@ const router = createRouter({
           name: 'Table',
           component: () => import('@/views/Demo/TableDemo/index.vue'),
           meta: {
-            requireAuth: true
+            requireAuth: true,
+            title: '列表示例',
+            icon: 'Monitor'
           }
         },
         {
@@ -46,7 +50,9 @@ const router = createRouter({
           name: 'TreeTable',
           component: () => import('@/views/Demo/TreeTableDemo/index.vue'),
           meta: {
-            requireAuth: true
+            requireAuth: true,
+            title: '树形表格',
+            icon: 'Monitor'
           }
         },
         {
@@ -54,7 +60,9 @@ const router = createRouter({
           name: 'Form',
           component: () => import('@/views/Demo/FormDemo/index.vue'),
           meta: {
-            requireAuth: true
+            requireAuth: true,
+            title: '表单示例',
+            icon: 'Monitor'
           }
         },
         {
@@ -62,7 +70,9 @@ const router = createRouter({
           name: 'Info',
           component: () => import('@/views/Demo/InfoDemo/index.vue'),
           meta: {
-            requireAuth: true
+            requireAuth: true,
+            title: '详情示例',
+            icon: 'Monitor'
           }
         },
         {
@@ -70,7 +80,9 @@ const router = createRouter({
           name: 'File',
           component: () => import('@/views/Demo/FileDemo/index.vue'),
           meta: {
-            requireAuth: true
+            requireAuth: true,
+            title: '文件上传',
+            icon: 'Monitor'
           }
         },
         {
