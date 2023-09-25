@@ -108,36 +108,36 @@ const router = createRouter({
           meta: {
             requireAuth: true
           }
-        },
-        {
-          path: '/Index/Data/Entity',
-          name: 'Entity',
-          component: () => import('@/views/Demo/EntityDemo/index.vue'),
-          meta: {
-            requireAuth: true
-          }
-        },
-        {
-          path: '/Index/Data/Message',
-          name: 'Message',
-          component: () => import('@/views/Demo/MessageDemo/index.vue'),
-          meta: {
-            requireAuth: true
-          }
-        },
-        {
-          path: '/Index/Data/MessageRead',
-          name: 'MessageRead',
-          component: () => import('@/views/Demo/MessageReadDemo/index.vue'),
-          meta: {
-            requireAuth: true
-          }
-        },
-        {
-          path: '/Index/Data/Code',
-          name: 'code',
-          component: () => import('@/views/Demo/CodeDemo/index.vue')
         }
+        // {
+        //   path: '/Index/Data/Entity',
+        //   name: 'Entity',
+        //   component: () => import('@/views/Demo/EntityDemo/index.vue'),
+        //   meta: {
+        //     requireAuth: true
+        //   }
+        // },
+        // {
+        //   path: '/Index/Data/Message',
+        //   name: 'Message',
+        //   component: () => import('@/views/Demo/MessageDemo/index.vue'),
+        //   meta: {
+        //     requireAuth: true
+        //   }
+        // },
+        // {
+        //   path: '/Index/Data/MessageRead',
+        //   name: 'MessageRead',
+        //   component: () => import('@/views/Demo/MessageReadDemo/index.vue'),
+        //   meta: {
+        //     requireAuth: true
+        //   }
+        // },
+        // {
+        //   path: '/Index/Data/Code',
+        //   name: 'code',
+        //   component: () => import('@/views/Demo/CodeDemo/index.vue')
+        // }
       ]
     }
   ]
