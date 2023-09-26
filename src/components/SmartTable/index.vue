@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { getEntityConfig } from '@/api/entity'
 import { ref } from 'vue'
 
 // 表示高级筛选是否展示
@@ -16,9 +17,14 @@ const searchFilterForm = ref({ user: '', region: '' })
 // 表格数据
 const tableData = [
   {
+    id: '1',
     date: '2016-05-03',
     name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles'
+    address: 'No. 189, Grove St, Los Angeles',
+    date1: '2016-05-03',
+    name1: 'Tom',
+    address1: 'No. 189, Grove St, Los Angeles',
+    address2: 'No. 189, Grove St, Los Angeles'
   },
   {
     date: '2016-05-02',
@@ -36,6 +42,17 @@ const tableData = [
     address: 'No. 189, Grove St, Los Angeles'
   }
 ]
+
+// 表格实体配置(表格配置项(表格展示列))
+// 写法: 本地配置  服务端返回
+const config = ref<any>([])
+
+const loadEntityConfig = async () => {
+  const res = await getEntityConfig({ type: 'demo' })
+  console.log('res=>', res)
+  config.value = res.data
+}
+loadEntityConfig()
 </script>
 
 <template>
@@ -112,9 +129,9 @@ const tableData = [
 
   <div class="table-box">
     <el-table stripe :data="tableData" style="width: 100%">
-      <el-table-column prop="date" label="Date" width="180" />
-      <el-table-column prop="name" label="Name" width="180" />
-      <el-table-column prop="address" label="Address" />
+      <template v-for="(item, index) in config" :key="index">
+        <el-table-column v-bind="item" />
+      </template>
     </el-table>
     <div class="page-box">
       <el-pagination
