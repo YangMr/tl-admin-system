@@ -8,14 +8,16 @@ const searchFilterBoxVisable = ref<boolean>(false)
 // 快捷搜索表单
 const searchForm = ref({
   type: '',
-  input: ''
+  value: ''
 })
 
 // 高级筛选表单
 const searchFilterForm = ref({ user: '', region: '' })
 
+const showInput = ref(false)
+
 // 表格数据
-const tableData = [
+const tableData = ref([
   {
     id: '1',
     date: '2016-05-03',
@@ -24,35 +26,137 @@ const tableData = [
     date1: '2016-05-03',
     name1: 'Tom',
     address1: 'No. 189, Grove St, Los Angeles',
-    address2: 'No. 189, Grove St, Los Angeles'
+    address2: 'No. 189, Grove St, Los Angeles',
+    icon: 'View',
+    imgUrl: 'https://element-plus.gitee.io/images/element-plus-logo.svg',
+    linkUrl: 'https://www.baidu.com',
+    count: 100,
+    public: 0, // 0 不公开 1公开
+    price: [
+      {
+        code: ''
+      },
+      {
+        code: ''
+      }
+    ]
   },
   {
     date: '2016-05-02',
     name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles'
+    address: 'No. 189, Grove St, Los Angeles',
+    icon: 'Edit',
+    imgUrl: 'https://element-plus.gitee.io/images/element-plus-logo.svg',
+    linkUrl: 'https://www.jd.com',
+    count: 10
+    // price: ''
   },
   {
     date: '2016-05-04',
     name: 'Tom',
     address: 'No. 189, Grove St, Los Angeles'
+    // price: ''
   },
   {
     date: '2016-05-01',
     name: 'Tom',
     address: 'No. 189, Grove St, Los Angeles'
+    // price: ''
+  },
+  {
+    id: '1',
+    date: '2016-05-03',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles',
+    date1: '2016-05-03',
+    name1: 'Tom',
+    address1: 'No. 189, Grove St, Los Angeles',
+    address2: 'No. 189, Grove St, Los Angeles',
+    icon: 'View',
+    imgUrl: 'https://element-plus.gitee.io/images/element-plus-logo.svg',
+    linkUrl: 'https://www.baidu.com',
+    count: 100
+    // price: ''
   }
-]
+])
 
 // 表格实体配置(表格配置项(表格展示列))
 // 写法: 本地配置  服务端返回
-const config = ref<any>([])
+const entityConfig = ref<any>([])
 
 const loadEntityConfig = async () => {
   const res = await getEntityConfig({ type: 'demo' })
   console.log('res=>', res)
-  config.value = res.data
+  entityConfig.value = res.data
+
+  entityConfig.value.forEach((item: any) => {
+    if (item.search && !searchForm.value.type) {
+      searchForm.value.type = item.prop
+    }
+
+    if (item.search || item.tableShow) {
+      if (item.type === '6') {
+        item.dicts = []
+
+        loadDictData(item)
+      }
+      if (item.type === '7') {
+        item.datas = []
+        loadLinkData(item)
+      }
+    }
+  })
 }
 loadEntityConfig()
+
+const searchChange = () => {
+  // searchForm.value.value = ''
+  console.log('aa', searchForm.value.type)
+}
+
+// 加载数据字典的数据
+const loadDictData = (item: any) => {
+  const data = [
+    { name: '正常', value: '1' },
+    { name: '审核中', value: '2' },
+    { name: '已删除', value: '3' }
+  ]
+
+  item.dicts = data
+}
+
+const loadLinkData = (item: any) => {}
+
+const addRow = () => {
+  tableData.value.push({
+    id: '8',
+    date: '2016-05-03',
+    name: 'Tom',
+    address: 'No. 189, Grove St, Los Angeles',
+    date1: '2016-05-03',
+    name1: 'Tom',
+    address1: 'No. 189, Grove St, Los Angeles',
+    address2: 'No. 189, Grove St, Los Angeles',
+    icon: 'View',
+    imgUrl: 'https://element-plus.gitee.io/images/element-plus-logo.svg',
+    linkUrl: 'https://www.baidu.com',
+    count: 100,
+    price: [{ code: '' }],
+    public: 1
+  })
+}
+
+const addInput = (id: string | number) => {
+  console.log('tableData', tableData.value)
+  console.log('id', id)
+  tableData.value.forEach((item) => {
+    if (item.id == id) {
+      console.log('item=>', item)
+      item.price!.push({ code: '' })
+    }
+  })
+  // console.log('aaa', index, tableData.value[index])
+}
 </script>
 
 <template>
@@ -64,12 +168,53 @@ loadEntityConfig()
     <div class="search-form-box flex">
       <div class="search-form-label">快捷搜索:</div>
       <div class="search-form-type-box">
-        <el-select v-model="searchForm.type" placeholder="请选择筛选的内容">
-          <el-option></el-option>
+        <el-select v-model="searchForm.type" @change="searchChange" placeholder="请选择筛选的内容">
+          <template v-for="(item, index) in entityConfig" :key="index">
+            <el-option v-if="item.search" :value="item.prop" :label="item.label"></el-option>
+          </template>
         </el-select>
       </div>
       <div class="search-form-value-box">
-        <el-input v-model="searchForm.input" placeholder="请输入" />
+        <template v-for="(item, index) in entityConfig" :key="index">
+          <template v-if="searchForm.type === item.prop">
+            <!-- //1.数字，2字符串，3日期，4时间，5关联对象，6数据字典，7图片 -->
+            <template v-if="item.type === '1'">
+              <el-input
+                type="number"
+                placeholder="最小值"
+                controls-position="right"
+                v-model="searchForm.value"
+              />
+            </template>
+            <template v-else-if="item.type === '2'">
+              <el-input
+                type="input"
+                v-model="searchForm.value"
+                :placeholder="'请输入' + item.label"
+              />
+            </template>
+            <template v-else-if="item.type === '3'">
+              <template v-if="item.formatter"> </template>
+              <template v-else> </template>
+            </template>
+            <template v-else-if="item.type === '4'">
+              <template v-if="item.formatter"> </template>
+              <template v-else> </template>
+            </template>
+            <template v-else-if="item.type === '5'"> </template>
+            <template v-else-if="item.type === '6'">
+              <el-select
+                @change="searchChange"
+                v-model="searchForm.value"
+                :placeholder="'请选择' + item.label"
+              >
+                <template v-for="(dictItem, dictIndex) in item.dicts" :key="dictIndex">
+                  <el-option :label="dictItem.name" :value="dictItem.value"></el-option>
+                </template>
+              </el-select>
+            </template>
+          </template>
+        </template>
       </div>
       <el-button-group class="search-form-btns">
         <el-button type="primary" icon="Search">搜索</el-button>
@@ -128,13 +273,54 @@ loadEntityConfig()
   <el-divider />
 
   <div class="table-box">
+    <el-button type="primary" @click="addRow">新增一行</el-button>
     <el-table stripe :data="tableData" style="width: 100%">
-      <template v-for="(item, index) in config" :key="index">
+      <template v-for="(item, index) in entityConfig" :key="index">
         <el-table-column v-bind="item" />
       </template>
+      <el-table-column label="icon">
+        <template v-slot="scope">
+          <el-icon>
+            <component :is="scope.row.icon"></component>
+          </el-icon>
+        </template>
+      </el-table-column>
+      <el-table-column label="image">
+        <template v-slot="scope">
+          <a :href="scope.row.linkUrl">
+            <img v-if="scope.row.imgUrl" :src="scope.row.imgUrl" width="30" height="30" />
+          </a>
+        </template>
+      </el-table-column>
+      <el-table-column label="image">
+        <template v-slot="scope">
+          <el-input
+            @blur="showInput = false"
+            v-if="scope.row.count && showInput"
+            v-model="scope.row.count"
+          />
+          <span v-else @click="showInput = true">{{ scope.row.count }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="price">
+        <template v-slot="scope">
+          <template v-for="(item, index) in scope.row.price" :key="index">
+            <el-input v-model="item.code" />
+            <el-icon @click="addInput(scope.row.id)"><Plus /></el-icon>
+          </template>
+        </template>
+      </el-table-column>
+      <el-table-column prop="public" label="public">
+        <template v-slot="scope">
+          <!-- 1. 过滤器 -->
+          <!-- 通过v-if判断 -->
+          <el-tag type="info" v-if="scope.row.public === 0"> 不公开 </el-tag>
+          <el-tag type="success" v-if="scope.row.public === 1"> 公开 </el-tag>
+        </template>
+      </el-table-column>
     </el-table>
     <div class="page-box">
-      <el-pagination
+      <!-- <el-pagination
         v-model:current-page="currentPage4"
         v-model:page-size="pageSize4"
         :page-sizes="[100, 200, 300, 400]"
@@ -145,7 +331,7 @@ loadEntityConfig()
         :total="400"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-      />
+      /> -->
     </div>
   </div>
 </template>
