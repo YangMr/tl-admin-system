@@ -6,7 +6,7 @@ import utils from '@/utils/utils'
 
 // 创建axios实例对象
 const api = axios.create({
-  baseURL: '',
+  baseURL: '/dev',
   headers: {
     'Content-Type': 'application/json;charset=UTF-8'
   },
@@ -27,6 +27,8 @@ const api = axios.create({
 // 请求拦截器
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    config.headers.token =
+      'eyJhbGciOiJIUzUxMiIsInppcCI6IkdaSVAifQ.H4sIAAAAAAAAAKtWKi5NUrJSSkzJzcxT0lFKrShQsjI0szS1MLA0sjSpBQA99d1pIAAAAA.fPhk-4OawRzSPkCtJPC7o_OmtAhqF_UJg-l-cGhwo71eAINBb2P_hQMk09E-fuuCWksxcf-TuzX3lZuRZMH0mA'
     return config
   },
   (error) => {

@@ -271,7 +271,7 @@ const menuData = [
 ]
 
 // 获取菜单列表接口
-Mock.mock('/api/menu', () => {
+Mock.mock('/dev/api/menu', () => {
   return {
     code: 888,
     message: '',

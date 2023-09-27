@@ -1,12 +1,19 @@
 <script setup lang="ts">
-import { getEntityConfig } from '@/api/entity'
+import { getDictList, getEntityConfig, getUserList } from '@/api/entity'
 import { ref } from 'vue'
+
+const option = defineProps<{
+  type: string
+}>()
 
 // 表示高级筛选是否展示
 const searchFilterBoxVisable = ref<boolean>(false)
 
 // 快捷搜索表单
-const searchForm = ref({
+const searchForm = ref<{
+  type: string
+  value: string | null
+}>({
   type: '',
   value: ''
 })
@@ -85,9 +92,10 @@ const tableData = ref([
 const entityConfig = ref<any>([])
 
 const loadEntityConfig = async () => {
-  const res = await getEntityConfig({ type: 'demo' })
+  // const res = await getEntityConfig({ ownerClass: option.type })
+  const res = await getEntityConfig({ type: option.type })
   console.log('res=>', res)
-  entityConfig.value = res.data
+  entityConfig.value = res.data?.configs!
 
   entityConfig.value.forEach((item: any) => {
     if (item.search && !searchForm.value.type) {
@@ -100,7 +108,7 @@ const loadEntityConfig = async () => {
 
         loadDictData(item)
       }
-      if (item.type === '7') {
+      if (item.type === '5') {
         item.datas = []
         loadLinkData(item)
       }
@@ -110,52 +118,35 @@ const loadEntityConfig = async () => {
 loadEntityConfig()
 
 const searchChange = () => {
-  // searchForm.value.value = ''
+  searchForm.value.value = null
   console.log('aa', searchForm.value.type)
 }
 
 // 加载数据字典的数据
-const loadDictData = (item: any) => {
-  const data = [
-    { name: '正常', value: '1' },
-    { name: '审核中', value: '2' },
-    { name: '已删除', value: '3' }
-  ]
+const loadDictData = async (item: any) => {
+  const dictRes = await getDictList({
+    key: item.dictKey
+  })
 
-  item.dicts = data
+  item.dicts = dictRes.data
 }
 
 const loadLinkData = (item: any) => {}
 
-const addRow = () => {
-  tableData.value.push({
-    id: '8',
-    date: '2016-05-03',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-    date1: '2016-05-03',
-    name1: 'Tom',
-    address1: 'No. 189, Grove St, Los Angeles',
-    address2: 'No. 189, Grove St, Los Angeles',
-    icon: 'View',
-    imgUrl: 'https://element-plus.gitee.io/images/element-plus-logo.svg',
-    linkUrl: 'https://www.baidu.com',
-    count: 100,
-    price: [{ code: '' }],
-    public: 1
-  })
-}
+// 根据关联对象的远程地址去加载数据
+const loadDataByUrl = async (item: any) => {
+  let params = {} as any
+  params[item.linkObjShowKey] = searchForm.value.type
 
-const addInput = (id: string | number) => {
-  console.log('tableData', tableData.value)
-  console.log('id', id)
-  tableData.value.forEach((item) => {
-    if (item.id == id) {
-      console.log('item=>', item)
-      item.price!.push({ code: '' })
+  const userRes = await getUserList(params)
+
+  console.log('userRes', userRes)
+
+  entityConfig.value.forEach((row: any) => {
+    if (row.prop === item.prop) {
+      row.datas = userRes.data
     }
   })
-  // console.log('aaa', index, tableData.value[index])
 }
 </script>
 
@@ -170,7 +161,7 @@ const addInput = (id: string | number) => {
       <div class="search-form-type-box">
         <el-select v-model="searchForm.type" @change="searchChange" placeholder="请选择筛选的内容">
           <template v-for="(item, index) in entityConfig" :key="index">
-            <el-option v-if="item.search" :value="item.prop" :label="item.label"></el-option>
+            <el-option v-if="item.defaultSearch" :value="item.prop" :label="item.label"></el-option>
           </template>
         </el-select>
       </div>
@@ -194,22 +185,69 @@ const addInput = (id: string | number) => {
               />
             </template>
             <template v-else-if="item.type === '3'">
-              <template v-if="item.formatter"> </template>
-              <template v-else> </template>
+              <template v-if="item.formatter">
+                <el-date-picker
+                  v-model="searchForm.value"
+                  type="daterange"
+                  range-separator="到"
+                  :format="item.formatter"
+                  :start-placeholder="'开始' + item.label"
+                  :end-placeholder="'结束' + item.label"
+                />
+              </template>
+              <template v-else>
+                <el-date-picker
+                  v-model="searchForm.value"
+                  type="daterange"
+                  range-separator="到"
+                  format="YYYY-MM-DD HH:mm:ss"
+                  :start-placeholder="'开始' + item.label"
+                  :end-placeholder="'结束' + item.label"
+                />
+              </template>
             </template>
             <template v-else-if="item.type === '4'">
-              <template v-if="item.formatter"> </template>
-              <template v-else> </template>
+              <template v-if="item.formatter">
+                <el-time-picker
+                  v-model="searchForm.value"
+                  is-range
+                  range-separator="到"
+                  :format="item.formatter"
+                  :start-placeholder="'开始' + item.label"
+                  :end-placeholder="'结束' + item.label"
+                />
+              </template>
+              <template v-else>
+                <el-time-picker
+                  v-model="searchForm.value"
+                  is-range
+                  range-separator="到"
+                  format="HH:mm:ss"
+                  :start-placeholder="'开始' + item.label"
+                  :end-placeholder="'结束' + item.label"
+                />
+              </template>
             </template>
-            <template v-else-if="item.type === '5'"> </template>
-            <template v-else-if="item.type === '6'">
+            <template v-else-if="item.type === '5'">
               <el-select
-                @change="searchChange"
+                filterable
+                remote
                 v-model="searchForm.value"
                 :placeholder="'请选择' + item.label"
+                :remote-method="loadDataByUrl(item)"
               >
+                <template v-for="(dataItem, dataIndex) in item.datas" :key="dataIndex">
+                  <el-option
+                    :label="dataItem[item.linkObjShowKey]"
+                    :value="dataItem.id"
+                  ></el-option>
+                </template>
+              </el-select>
+            </template>
+            <template v-else-if="item.type === '6'">
+              <el-select v-model="searchForm.value" :placeholder="'请选择' + item.label">
                 <template v-for="(dictItem, dictIndex) in item.dicts" :key="dictIndex">
-                  <el-option :label="dictItem.name" :value="dictItem.value"></el-option>
+                  <el-option :label="dictItem.label" :value="dictItem.value"></el-option>
                 </template>
               </el-select>
             </template>
